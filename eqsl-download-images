@@ -1,0 +1,111 @@
+#!/usr/bin/perl
+# eqsl.cc QSL scraping script  2-clause BSD license.
+
+# in order to login, you need to put these two lines in
+# $HOME/.eqsllogin:
+
+# login_callsign="YOURCALL"
+# login_password="yourpass"
+
+use strict;
+use URI::Escape;
+
+my ($login, $pass);
+
+my $start_year = 2011;
+#my $max_year = 2018;
+my $max_year = 2012;
+
+my $loginfile = $ENV{'HOME'} . "/.eqsllogin";
+my $cookiefile = $ENV{'HOME'} . "/.eqslcookies";
+
+open(LOGIN, "<", $loginfile);
+while (<LOGIN>) {
+  if (/^login_callsign="(.*?)"/) {
+    $login = $1;
+  }
+  if (/^login_password="(.*?)"/) {
+    $pass = $1;
+  }
+}
+close(LOGIN);
+
+if (not defined $login or not defined $pass) {
+  die "must provide login information.";
+}
+
+print "Logging in $login...";
+
+my $url="https://www.eQSL.cc/QSLCard/LoginFinish.cfm";
+open (HTTP, '-|', "curl -s -k -L --cookie $cookiefile --cookie-jar $cookiefile --data 'Callsign=${login}&EnteredPassword=${pass}&Login=Go' $url");
+while(<HTTP>) {
+}
+close(HTTP);
+
+#$url = "https://www.eqsl.cc/QSLCard/CookieTest.cfm?sw=1920&sh=1200";
+#open (HTTP, '-|', "curl -s -k -L --cookie $cookiefile --cookie-jar $cookiefile $url");
+#while(<HTTP>) {
+#}
+#close(HTTP);
+
+my @cardpages;
+my @imgurls;
+
+print "\nretrieving QSLs..\n";
+
+# loop - year, month, archive
+
+for (my $year = $start_year; $year <= $max_year; $year++) {
+  for (my $month = 1; $month < 13; $month++) {
+    for (my $archive = 0; $archive < 2; $archive++) {
+      my $monthtext = $month;
+      $monthtext = "0$month" if $month < 10;
+
+      $url = "https://www.eqsl.cc/QSLCard/Inbox.cfm?Archive=$archive&Reject=0&LimitDateMonth=${year}%20$monthtext";
+      #print "$url\n";
+      open (HTTP, '-|', "curl -s -k -L --cookie $cookiefile --cookie-jar $cookiefile '$url'");
+      while(<HTTP>) {
+	if (/popupPrintPage\('(DisplayeQSL.cfm\?[^']+)'/) {
+	  #print;
+	  push (@cardpages, "https://www.eqsl.cc/QSLCard/$1");
+	}
+      }
+      close(HTTP);
+      print "\r$year-$monthtext ", scalar @cardpages, " QSLs found";
+    }
+  }
+}
+print "\n";
+
+#print join("\n", @cardpages);
+
+foreach my $p (@cardpages) {
+  #print "$p\n";
+  my ($mycall, $hiscall, $date, $band, $mode);
+  $mycall = $hiscall = $date = $band = $mode = $p;
+  $mycall =~ s/.*VisitorCallsign=(\w+)\&.*/$1/;
+  $mycall = uc $mycall;
+  $hiscall =~ s/.*[^r]Callsign=(\w+)\&.*/$1/;
+  $hiscall = uc $hiscall;
+  $date =~ s/.*QSODate=(.*?)\&.*/$1/;
+  $date = uri_unescape($date);
+  $date =~ tr/ /_/;
+  $band =~ s/.*Band=(.*?)\&.*/$1/;
+  $band = lc $band;
+  $mode =~ s/.*Mode=(.*)/$1/;
+
+  open (HTTP, '-|', "curl -s -k -L --cookie $cookiefile --cookie-jar $cookiefile '$p'");
+  while(<HTTP>) {
+    if (m|<img src="/CFFileServlet/_cf_image/([^"]+)"|) {
+      my $file = "$mycall-$date-$hiscall-$band-$mode.png";
+      my $imgurl = "https://www.eqsl.cc/CFFileServlet/_cf_image/$1";
+      #print "$imgurl\n";
+      print "$file\n";
+      system("curl -s -k -L -o '$file' '$imgurl'");
+    }
+  }
+  close(HTTP);
+}
+
+print "done.\n";
+
