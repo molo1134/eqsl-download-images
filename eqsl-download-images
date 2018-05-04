@@ -82,7 +82,7 @@ print "\n";
 foreach my $p (@cardpages) {
   #print "$p\n";
   my ($mycall, $hiscall, $date, $band, $mode);
-  $mycall = $hiscall = $date = $band = $mode = $p;
+  $mycall = $hiscall = $date = $band = $mode = uri_unescape($p);
   $mycall =~ s/.*VisitorCallsign=([\w\/\\-]+)\&.*/$1/;
   $mycall = uc $mycall;
   $mycall =~ tr/\\\//__/;
@@ -90,7 +90,6 @@ foreach my $p (@cardpages) {
   $hiscall = uc $hiscall;
   $hiscall =~ tr/\\\//__/;
   $date =~ s/.*QSODate=(.*?)\&.*/$1/;
-  $date = uri_unescape($date);
   $date =~ tr/ /_/;
   $band =~ s/.*Band=(.*?)\&.*/$1/;
   $band = lc $band;
