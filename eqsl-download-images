@@ -13,8 +13,8 @@ use URI::Escape;
 my ($login, $pass);
 
 my $start_year = 2011;
-#my $max_year = 2018;
-my $max_year = 2012;
+my $max_year = 2018;
+#my $max_year = 2012;
 
 my $loginfile = $ENV{'HOME'} . "/.eqsllogin";
 my $cookiefile = $ENV{'HOME'} . "/.eqslcookies";
