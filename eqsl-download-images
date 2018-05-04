@@ -13,8 +13,8 @@ use URI::Escape;
 my ($login, $pass);
 
 my $start_year = 2011;
-my $max_year = 2018;
-#my $max_year = 2012;
+#my $max_year = 2018;
+my $max_year = 2012;
 
 my $loginfile = $ENV{'HOME'} . "/.eqsllogin";
 my $cookiefile = $ENV{'HOME'} . "/.eqslcookies";
@@ -83,10 +83,12 @@ foreach my $p (@cardpages) {
   #print "$p\n";
   my ($mycall, $hiscall, $date, $band, $mode);
   $mycall = $hiscall = $date = $band = $mode = $p;
-  $mycall =~ s/.*VisitorCallsign=(\w+)\&.*/$1/;
+  $mycall =~ s/.*VisitorCallsign=([\w\/\\-]+)\&.*/$1/;
   $mycall = uc $mycall;
-  $hiscall =~ s/.*[^r]Callsign=(\w+)\&.*/$1/;
+  $mycall =~ tr/\\\//__/;
+  $hiscall =~ s/.*[^r]Callsign=([\w\/\\-]+)\&.*/$1/;
   $hiscall = uc $hiscall;
+  $hiscall =~ tr/\\\//__/;
   $date =~ s/.*QSODate=(.*?)\&.*/$1/;
   $date = uri_unescape($date);
   $date =~ tr/ /_/;
@@ -98,6 +100,7 @@ foreach my $p (@cardpages) {
   while(<HTTP>) {
     if (m|<img src="/CFFileServlet/_cf_image/([^"]+)"|) {
       my $file = "$mycall-$date-$hiscall-$band-$mode.png";
+      $file =~ tr/\\\//__/;
       my $imgurl = "https://www.eqsl.cc/CFFileServlet/_cf_image/$1";
       #print "$imgurl\n";
       print "$file\n";
