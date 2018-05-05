@@ -79,6 +79,9 @@ print "\n";
 
 #print join("\n", @cardpages);
 
+my $count = 0;
+my @missing;
+
 foreach my $p (@cardpages) {
   #print "$p\n";
   my ($mycall, $hiscall, $date, $band, $mode);
@@ -95,6 +98,8 @@ foreach my $p (@cardpages) {
   $band = lc $band;
   $mode =~ s/.*Mode=(.*)/$1/;
 
+  my $found = 0;
+
   open (HTTP, '-|', "curl -s -k -L --cookie $cookiefile --cookie-jar $cookiefile '$p'");
   while(<HTTP>) {
     if (m|<img src="/CFFileServlet/_cf_image/([^"]+)"|) {
@@ -104,10 +109,18 @@ foreach my $p (@cardpages) {
       #print "$imgurl\n";
       print "$file\n";
       system("curl -s -k -L -o '$file' '$imgurl'");
+      $count++;
+      $found = 1;
     }
   }
   close(HTTP);
+  push (@missing, $p) if $found == 0;
 }
 
-print "done.\n";
+print "Expected ", scalar @cardpages, " QSLs.  Found $count images.\n";
+
+print "Pages missing images:\n" if scalar @missing > 0;
+print join("\n", @missing);
+
+print "\nDone.\n";
 
