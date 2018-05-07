@@ -4,8 +4,8 @@ This is a simple perl script to download eQSL.cc QSL images.  It has minimal
 error checking, but seems to mostly function.
 
 Please note: by retrieving these images, eQSL will automatically move your QSLs
-from the *INBOX* to the *Archive*.  If keeping your inbox in its current state
-is important to you, don't run this tool.
+from the *INBOX* to the *Archive*.  **If keeping your inbox in its current
+state is important to you, don't run this tool.**
 
 ## Copyright and License
 
