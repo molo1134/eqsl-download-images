@@ -9,6 +9,13 @@
 # login_callsign="YOURCALL"
 # login_password="yourpass"
 
+# usage:
+#
+# ./eqsl-download-images [start_year] [end_year]
+#
+# Default start year of 2000 and end year of the current year will be used if
+# not specified.
+
 use strict;
 use URI::Escape;
 
@@ -113,21 +120,26 @@ foreach my $p (@cardpages) {
   $mode =~ s/.*Mode=(.*)/$1/;
 
   my $found = 0;
+  my $tries = 0;
 
-  open (HTTP, '-|', "curl -s -k -L --cookie $cookiefile --cookie-jar $cookiefile '$p'");
-  while(<HTTP>) {
-    if (m|<img src="/CFFileServlet/_cf_image/([^"]+)"|) {
-      my $file = "$mycall-$date-$hiscall-$band-$mode.png";
-      $file =~ tr/\\\//__/;
-      my $imgurl = "https://www.eqsl.cc/CFFileServlet/_cf_image/$1";
-      #print "$imgurl\n";
-      print "$file\n";
-      system("curl -s -k -L -o '$file' '$imgurl'");
-      $count++;
-      $found = 1;
+  while ($found == 0 and $tries < 3) {
+    open (HTTP, '-|', "curl --max-time 20 -s -k -L --cookie $cookiefile --cookie-jar $cookiefile '$p'");
+    while(<HTTP>) {
+      if (m|<img src="/CFFileServlet/_cf_image/([^"]+)"|) {
+	my $file = "$mycall-$date-$hiscall-$band-$mode.png";
+	$file =~ tr/\\\//__/;
+	my $imgurl = "https://www.eqsl.cc/CFFileServlet/_cf_image/$1";
+	#print "$imgurl\n";
+	print "$file\n";
+	system("curl --max-time 30 -s -k -L -o '$file' '$imgurl'");
+	$count++;
+	$found = 1;
+      }
     }
+    close(HTTP);
+    $tries++;
+    print "retrying..\n" if $found == 0;
   }
-  close(HTTP);
   push (@missing, $p) if $found == 0;
 }
 
