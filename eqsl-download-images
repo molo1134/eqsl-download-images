@@ -14,12 +14,21 @@ use URI::Escape;
 
 my ($login, $pass);
 
-my $start_year = 2011;
-my $max_year = 2018;
-#my $max_year = 2012;
+my $start_year = 2000; # a default
+my $max_year; # set to current year
+(undef,undef,undef,undef,undef,$max_year,undef,undef,undef) = localtime(time);
+$max_year += 1900;
 
 my $loginfile = $ENV{'HOME'} . "/.eqsllogin";
 my $cookiefile = $ENV{'HOME'} . "/.eqslcookies";
+
+$start_year = $ARGV[0] if defined($ARGV[0]) and $ARGV[0] =~ /^\d{4}$/;
+$max_year = $ARGV[1] if defined($ARGV[1]) and $ARGV[1] =~ /^\d{4}$/;
+
+if ($max_year < $start_year) {
+  print STDERR "error: starting in $start_year but set to end in $max_year\n";
+  exit 1;
+}
 
 open(LOGIN, "<", $loginfile) || die "unable to open $loginfile";
 while (<LOGIN>) {

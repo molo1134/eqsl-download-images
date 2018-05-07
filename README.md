@@ -36,9 +36,6 @@ login_callsign="YOURCALL"
 login_password="yourpass"
 ```
 
-Currently the start year is hardcoded.  Please edit `esdl-download-images` if
-you want to use a start year other than 2011.
-
 State is stored in the `$HOME/.eqslcookies` file.  Please remove this file if
 any kind of bad state is encountered.
 
@@ -52,16 +49,18 @@ those images.
 Run as follows:
 
 ```
-./eqsl-download-images
+./eqsl-download-images [start_year] [end_year]
 ```
 
-Example output:
+Default `start_year` is 2000.  Default `end_year` is the current calendar year.
+
+Example, retrieving just 2017 QSLs:
 
 ```
-$ ./eqsl-download-images
+$ ./eqsl-download-images 2017 2017
 Logging in W1CALL...
 retrieving QSLs..
-2018-12 114 QSLs found
+2017-12 114 QSLs found
 W1CALL-2017-01-15_08:06:00.0-N0XX-40m-SSB.png
 W1CALL-2017-01-15_08:32:00.0-K7XXX-40m-SSB.png
 W1CALL-2017-01-15_17:08:00.0-KC2XXX-40m-SSB.png
@@ -76,7 +75,6 @@ Done.
 
 ## TODO
 
-1. Accept the start year on the command line
-2. Handle multiple "accounts" for different QTHs with the same callsign
-3. More error checking
+1. Handle multiple "accounts" for different QTHs with the same callsign
+2. More error checking
 
