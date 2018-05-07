@@ -19,7 +19,7 @@ my $max_year = 2018;
 my $loginfile = $ENV{'HOME'} . "/.eqsllogin";
 my $cookiefile = $ENV{'HOME'} . "/.eqslcookies";
 
-open(LOGIN, "<", $loginfile);
+open(LOGIN, "<", $loginfile) || die "unable to open $loginfile";
 while (<LOGIN>) {
   if (/^login_callsign="(.*?)"/) {
     $login = $1;
