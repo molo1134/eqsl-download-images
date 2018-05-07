@@ -104,6 +104,9 @@ foreach my $p (@cardpages) {
   $hiscall = uc $hiscall;
   $hiscall =~ tr/\\\//__/;
   $date =~ s/.*QSODate=(.*?)\&.*/$1/;
+  $date =~ s/\.0//;
+  $date =~ s/:00//;
+  $date =~ s/[-:]//g;
   $date =~ tr/ /_/;
   $band =~ s/.*Band=(.*?)\&.*/$1/;
   $band = lc $band;
