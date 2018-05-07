@@ -7,6 +7,12 @@ Please note: by retrieving these images, eQSL will automatically move your QSLs
 from the *INBOX* to the *Archive*.  If keeping your inbox in its current state
 is important to you, don't run this tool.
 
+## Copyright and License
+
+Copyright (c) 2018, molo1134
+
+[2-Clause BSD License](LICENSE)
+
 ## Requirements
 
 Debian/Ubuntu linux packages:

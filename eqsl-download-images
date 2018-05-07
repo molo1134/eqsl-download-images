@@ -1,5 +1,7 @@
 #!/usr/bin/perl
-# eqsl.cc QSL scraping script  2-clause BSD license.
+# eqsl.cc QSL scraping script
+# Copyright (c) 2018, molo1134
+# 2-clause BSD license
 
 # in order to login, you need to put these two lines in
 # $HOME/.eqsllogin:
